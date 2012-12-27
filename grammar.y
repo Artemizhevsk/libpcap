@@ -36,8 +36,6 @@ static const char rcsid[] _U_ =
 #include <sys/socket.h>
 #endif /* WIN32 */
 
-#include <stdlib.h>
-
 #ifndef WIN32
 #if __STDC__
 struct mbuf;

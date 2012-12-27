@@ -28,8 +28,6 @@ AC_LBL_SHLIBS_INIT
 AC_LBL_C_INLINE
 AC_C___ATTRIBUTE__
 
-AC_CHECK_HEADERS(sys/bitypes.h)
-
 AC_CHECK_TYPE([int8_t], ,
 	[AC_DEFINE([int8_t], [signed char],
 	[Define to `signed char' if int8_t not defined.])],
@@ -160,97 +158,6 @@ fi
 # "gethostbyname() -ish function".
 #
 AC_LBL_LIBRARY_NET
-
-#
-# You are in a twisty little maze of UN*Xes, all different.
-# Some might not have ether_hostton().
-# Some might have it, but not declare it in any header file.
-# Some might have it, but declare it in <netinet/if_ether.h>.
-# Some might have it, but declare it in <netinet/ether.h>
-# (And some might have it but document it as something declared in
-# <netinet/ethernet.h>, although <netinet/if_ether.h> appears to work.)
-#
-# Before you is a C compiler.
-#
-AC_CHECK_FUNCS(ether_hostton)
-if test "$ac_cv_func_ether_hostton" = yes; then
-	#
-	# OK, we have ether_hostton().  Do we have <netinet/if_ether.h>?
-	#
-	if test "$ac_cv_header_netinet_if_ether_h" = yes; then
-		#
-		# Yes.  Does it declare ether_hostton()?
-		#
-		AC_CHECK_DECL(ether_hostton,
-		    [
-			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_HOSTTON,,
-			    [Define to 1 if netinet/if_ether.h declares `ether_hostton'])
-		    ],,
-		    [
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>
-#include <netinet/if_ether.h>
-		    ])
-	fi
-	#
-	# Did that succeed?
-	#
-	if test "$ac_cv_have_decl_ether_hostton" != yes; then
-		#
-		# No, how about <netinet/ether.h>, as on Linux?
-		#
-		AC_CHECK_HEADERS(netinet/ether.h)
-		if test "$ac_cv_header_netinet_ether_h" = yes; then
-			#
-			# We have it - does it declare ether_hostton()?
-			# Unset ac_cv_have_decl_ether_hostton so we don't
-			# treat the previous failure as a cached value and
-			# suppress the next test.
-			#
-			unset ac_cv_have_decl_ether_hostton
-			AC_CHECK_DECL(ether_hostton,
-			    [
-				AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_HOSTTON,,
-				    [Define to 1 if netinet/ether.h declares `ether_hostton'])
-			    ],,
-			    [
-#include <netinet/ether.h>
-			    ])
-		fi
-	fi
-	#
-	# Is ether_hostton() declared?
-	#
-	if test "$ac_cv_have_decl_ether_hostton" != yes; then
-		#
-		# No, we'll have to declare it ourselves.
-		# Do we have "struct ether_addr"?
-		#
-		AC_CHECK_TYPES(struct ether_addr,,,
-		    [
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>
-#include <netinet/if_ether.h>
-		    ])
-		AC_DEFINE(HAVE_DECL_ETHER_HOSTTON, 0,
-		    [Define to 1 if you have the declaration of `ether_hostton', and to 0 if you
-don't.])
-	else
-		AC_DEFINE(HAVE_DECL_ETHER_HOSTTON, 1,
-		    [Define to 1 if you have the declaration of `ether_hostton', and to 0 if you
-don't.])
-	fi
-fi
 
 dnl to pacify those who hate protochain insn
 AC_MSG_CHECKING(if --disable-protochain option is specified)
@@ -436,23 +343,6 @@ linux)
 #include <linux/if.h>
 #include <linux/types.h>
 	])
-
-	#
-	# Do we have libnl?
-	#
-	AC_ARG_WITH(libnl,
-	AC_HELP_STRING([--without-libnl],[disable libnl support @<:@default=yes, on Linux, if present@:>@]),
-		with_libnl=$withval,,)
-
-	if test x$with_libnl != xno ; then
-		AC_CHECK_LIB(nl, nl_handle_alloc,
-			LIBS="-lnl $LIBS"
-			AC_DEFINE(HAVE_LIBNL,1,[if libnl exists]),
-			if test x$with_libnl = xyes ; then
-				AC_MSG_ERROR([libnl support requested but libnl not found])
-			fi
-		)
-	fi
 
 	AC_LBL_TPACKET_STATS
 	AC_LBL_LINUX_TPACKET_AUXDATA_TP_VLAN_TCI
@@ -1320,101 +1210,6 @@ AC_SUBST(SSRC)
 AC_SUBST(DYEXT)
 AC_SUBST(MAN_FILE_FORMATS)
 AC_SUBST(MAN_MISC_INFO)
-
-dnl check for USB sniffing support
-AC_MSG_CHECKING(for USB sniffing support)
-case "$host_os" in
-linux*)
-       AC_DEFINE(PCAP_SUPPORT_USB, 1, [target host supports USB sniffing])
-       USB_SRC=pcap-usb-linux.c
-       AC_MSG_RESULT(yes)
-       ac_usb_dev_name=`udevinfo -q name -p /sys/class/usb_device/usbmon 2>/dev/null`
-       if test $? -ne 0 ; then
-               ac_usb_dev_name="usbmon"
-       fi
-       AC_DEFINE_UNQUOTED(LINUX_USB_MON_DEV, "/dev/$ac_usb_dev_name", [path for device for USB sniffing])
-       AC_MSG_NOTICE(Device for USB sniffing is /dev/$ac_usb_dev_name)
-       AC_CHECK_HEADERS(linux/usbdevice_fs.h)
-       if test "$ac_cv_header_linux_usbdevice_fs_h" = yes; then
-         #
-         # OK, does it define bRequestType?  Older versions of the kernel
-         # define fields with names like "requesttype, "request", and
-         # "value", rather than "bRequestType", "bRequest", and
-         # "wValue".
-         #
-         AC_MSG_CHECKING(if usbdevfs_ctrltransfer struct has bRequestType member)
-         AC_CACHE_VAL(ac_cv_usbdevfs_ctrltransfer_has_bRequestType,
-           AC_TRY_COMPILE([
-AC_INCLUDES_DEFAULT
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
-#endif
-#            include <linux/usbdevice_fs.h>],
-             [u_int i = sizeof(((struct usbdevfs_ctrltransfer *)0)->bRequestType)],
-             ac_cv_usbdevfs_ctrltransfer_has_bRequestType=yes,
-             ac_cv_usbdevfs_ctrltransfer_has_bRequestType=no))
-         AC_MSG_RESULT($ac_cv_usbdevfs_ctrltransfer_has_bRequestType)
-         if test $ac_cv_usbdevfs_ctrltransfer_has_bRequestType = yes ; then
-	    AC_DEFINE(HAVE_USBDEVFS_CTRLTRANSFER_BREQUESTTYPE,1,
-              [if struct usbdevfs_ctrltransfer has bRequestType])
-         fi
-       fi
-       ;;
-*)
-       AC_MSG_RESULT(no)
-       ;;
-esac
-AC_SUBST(PCAP_SUPPORT_USB)
-AC_SUBST(USB_SRC)
-
-AC_ARG_ENABLE([bluetooth],
-[AC_HELP_STRING([--enable-bluetooth],[enable Bluetooth support @<:@default=yes, if support available@:>@])],
-,enable_bluetooth=yes)
-
-if test "x$enable_bluetooth" != "xno" ; then
-	dnl check for Bluetooth sniffing support
-	case "$host_os" in
-	linux*)
-	       AC_CHECK_HEADER(bluetooth/bluetooth.h,
-	       	[
-		  AC_DEFINE(PCAP_SUPPORT_BT, 1, [target host supports Bluetooth sniffing])
-	          BT_SRC=pcap-bt-linux.c
-	          AC_MSG_NOTICE(Bluetooth sniffing is supported)
-		],
-		AC_MSG_NOTICE(Bluetooth sniffing is not supported; install bluez-lib devel to enable it)
-	       )
-	       ;;
-	*)
-	       AC_MSG_NOTICE(no Bluetooth sniffing support implemented for $host_os)
-	       ;;
-	esac
-	AC_SUBST(PCAP_SUPPORT_BT)
-	AC_SUBST(BT_SRC)
-fi
-
-AC_ARG_ENABLE([can],
-[AC_HELP_STRING([--enable-can],[enable CAN support @<:@default=yes, if support available@:>@])],
-,enable_can=yes)
-
-if test "x$enable_can" != "xno" ; then
-	dnl check for CAN sniffing support
-	case "$host_os" in
-	linux*)
-		AC_CHECK_HEADER(linux/can.h,
-			[ AC_DEFINE(PCAP_SUPPORT_CAN, 1, [target host supports CAN sniffing])
-			CAN_SRC=pcap-can-linux.c
-			AC_MSG_NOTICE(CAN sniffing is supported)],
-			AC_MSG_NOTICE(CAN sniffing is not supported),
-			[#include <sys/socket.h>]
-		   )
-		;;
-	*)
-		AC_MSG_NOTICE(no CAN sniffing support implemented for $host_os)
-		;;
-	esac
-	AC_SUBST(PCAP_SUPPORT_CAN)
-	AC_SUBST(CAN_SRC)
-fi
 
 AC_PROG_INSTALL
 

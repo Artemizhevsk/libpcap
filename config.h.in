@@ -18,18 +18,11 @@
 /* define if you have streams capable DAG API */
 #undef HAVE_DAG_STREAMS_API
 
-/* Define to 1 if you have the declaration of `ether_hostton', and to 0 if you
-   don't. */
-#undef HAVE_DECL_ETHER_HOSTTON
-
 /* define if you have a /dev/dlpi */
 #undef HAVE_DEV_DLPI
 
 /* if passive_req_t primitive exists */
 #undef HAVE_DLPI_PASSIVE
-
-/* Define to 1 if you have the `ether_hostton' function. */
-#undef HAVE_ETHER_HOSTTON
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 #undef HAVE_FSEEKO
@@ -49,26 +42,17 @@
 /* if libdlpi exists */
 #undef HAVE_LIBDLPI
 
-/* if libnl exists */
-#undef HAVE_LIBNL
-
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
 /* if tp_vlan_tci exists */
 #undef HAVE_LINUX_TPACKET_AUXDATA_TP_VLAN_TCI
 
-/* Define to 1 if you have the <linux/usbdevice_fs.h> header file. */
-#undef HAVE_LINUX_USBDEVICE_FS_H
-
 /* Define to 1 if you have the <linux/wireless.h> header file. */
 #undef HAVE_LINUX_WIRELESS_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <netinet/ether.h> header file. */
-#undef HAVE_NETINET_ETHER_H
 
 /* Define to 1 if you have the <netinet/if_ether.h> header file. */
 #undef HAVE_NETINET_IF_ETHER_H
@@ -130,12 +114,6 @@
 /* Define to 1 if the system has the type `struct BPF_TIMEVAL'. */
 #undef HAVE_STRUCT_BPF_TIMEVAL
 
-/* Define to 1 if the system has the type `struct ether_addr'. */
-#undef HAVE_STRUCT_ETHER_ADDR
-
-/* Define to 1 if you have the <sys/bitypes.h> header file. */
-#undef HAVE_SYS_BITYPES_H
-
 /* Define to 1 if you have the <sys/bufmod.h> header file. */
 #undef HAVE_SYS_BUFMOD_H
 
@@ -160,9 +138,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* if struct usbdevfs_ctrltransfer has bRequestType */
-#undef HAVE_USBDEVFS_CTRLTRANSFER_BREQUESTTYPE
-
 /* define if version.h is generated in the build procedure */
 #undef HAVE_VERSION_H
 
@@ -181,15 +156,6 @@
 /* if unaligned access fails */
 #undef LBL_ALIGN
 
-/* path for device for USB sniffing */
-#undef LINUX_USB_MON_DEV
-
-/* Define to 1 if netinet/ether.h declares `ether_hostton' */
-#undef NETINET_ETHER_H_DECLARES_ETHER_HOSTTON
-
-/* Define to 1 if netinet/if_ether.h declares `ether_hostton' */
-#undef NETINET_IF_ETHER_H_DECLARES_ETHER_HOSTTON
-
 /* do not use protochain */
 #undef NO_PROTOCHAIN
 
@@ -205,20 +171,14 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
 /* /dev/dlpi directory */
 #undef PCAP_DEV_PREFIX
-
-/* target host supports Bluetooth sniffing */
-#undef PCAP_SUPPORT_BT
-
-/* target host supports CAN sniffing */
-#undef PCAP_SUPPORT_CAN
-
-/* target host supports USB sniffing */
-#undef PCAP_SUPPORT_USB
 
 /* include ACN support */
 #undef SITA
