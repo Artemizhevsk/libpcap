@@ -294,8 +294,6 @@ EXTRA_DIST = \
 	pcap-snf.h \
 	pcap-snit.c \
 	pcap-snoop.c \
-	pcap-usb-linux.c \
-	pcap-usb-linux.h \
 	pcap-win32.c \
 	runlex.sh \
 	scanner.l \

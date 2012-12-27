@@ -703,12 +703,6 @@ pcap_lookupnet(device, netp, maskp, errbuf)
 #ifdef HAVE_SEPTEL_API
 	    || strstr(device, "septel") != NULL
 #endif
-#ifdef PCAP_SUPPORT_BT
-	    || strstr(device, "bluetooth") != NULL
-#endif
-#ifdef PCAP_SUPPORT_USB
-	    || strstr(device, "usbmon") != NULL
-#endif
 #ifdef HAVE_SNF_API
 	    || strstr(device, "snf") != NULL
 #endif
