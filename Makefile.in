@@ -231,7 +231,6 @@ EXTRA_DIST = \
 	configure.in \
 	dlpisubs.c \
 	dlpisubs.h \
-	fad-getad.c \
 	fad-gifc.c \
 	fad-glifc.c \
 	fad-null.c \
