@@ -145,19 +145,7 @@ pcap_nametoaddrinfo(const char *name)
 bpf_u_int32
 pcap_nametonetaddr(const char *name)
 {
-#ifndef WIN32
-	struct netent *np;
-
-	if ((np = getnetbyname(name)) != NULL)
-		return np->n_net;
-	else
-		return 0;
-#else
-	/*
-	 * There's no "getnetbyname()" on Windows.
-	 */
 	return 0;
-#endif
 }
 
 /*
@@ -259,17 +247,6 @@ pcap_nametoportrange(const char *name, int *port1, int *port2, int *proto)
 	return 1;
 }
 
-int
-pcap_nametoproto(const char *str)
-{
-	struct protoent *p;
-
-	p = getprotobyname(str);
-	if (p != 0)
-		return p->p_proto;
-	else
-		return PROTO_UNDEF;
-}
 
 #include "ethertype.h"
 
@@ -277,6 +254,28 @@ struct eproto {
 	const char *s;
 	u_short p;
 };
+
+
+struct eproto proto_db[] = {
+	{ "ip", 0 },
+	{ "ipv6", 41 },
+};
+
+int
+pcap_nametoproto(const char *str)
+{
+	struct eproto *p = proto_db;
+
+	while(p->s != 0) {
+		if(strcmp(p->s, str) == 0) {
+			return p->p;
+		}
+		p += 1;
+	}
+
+	return PROTO_UNDEF;
+}
+
 
 /* Static data base of ether protocol types. */
 struct eproto eproto_db[] = {
